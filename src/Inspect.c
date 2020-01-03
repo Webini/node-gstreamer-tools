@@ -240,7 +240,7 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void init(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE exports) {
-	gst_init(NULL, NULL);
+  gst_init(NULL, NULL);
   v8::Local<v8::Context> context = exports->CreationContext();
 
   exports->Set(context,

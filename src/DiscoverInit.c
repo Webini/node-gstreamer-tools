@@ -23,7 +23,7 @@ void DiscoverInit(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
 void init(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE exports) {
   v8::Local<v8::Context> context = exports->CreationContext();
-	gst_init(NULL, NULL);
+  gst_init(NULL, NULL);
 
   exports->Set(context,
                Nan::New("discover").ToLocalChecked(),

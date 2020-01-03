@@ -1,7 +1,7 @@
 {
   "name": "node-gstreamer-tools",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple wrapper for gstreamer inspection and discovering ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,5 +18,9 @@
   "gypfile": true,
   "devDependencies": {
     "node-gyp": "^5.0.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Webini/node-gstreamer-tools.git"
   }
 }
