@@ -5,10 +5,6 @@ System dependencies : `libgstreamer-1.0-dev libgstreamer-plugins-base1.0-dev`
 
 To install run `npm i node-gstreamer-tools`
 
-### BUILD DEV
-
-add `CC=<GCC path> CXX=<G++ path>` to env before call `npm run build`
-
 ## Examples
 
 ### Plugins inspection

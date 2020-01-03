@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "gst-inspect",
-      "sources": [ "src/GLibHelpers.cpp", "src/Inspect.c" ],
+      "sources": [ "src/GLibHelpers.cpp", "src/Inspect.cpp" ],
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         '<!@(pkg-config gstreamer-1.0 --cflags-only-I | sed s/-I//g)',
@@ -16,7 +16,7 @@
     },
     {
       "target_name": "gst-discover",
-      "sources": [ "src/GLibHelpers.cpp", "src/Discover.cpp", "src/DiscoverInit.c" ],
+      "sources": [ "src/GLibHelpers.cpp", "src/Discover.cpp", "src/DiscoverInit.cpp" ],
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         '<!@(pkg-config gstreamer-1.0 --cflags-only-I | sed s/-I//g)',
