@@ -24,7 +24,19 @@ console.log(plugins, pluginDetails);
 const gst = require('node-gstreamer-tools');
 
 gst
-  .discover("<media path>", 60) // 60 = timeout in seconds
+  .discover("file://<media path>", 60) // 60 = timeout in seconds
+  .then(mediaInfos => {
+    console.log(mediaInfos);
+  })
+  .catch(e => {
+    console.log(e);
+  })
+;
+
+// or 
+
+gst
+  .discover("http(s)://<url>", 10)
   .then(mediaInfos => {
     console.log(mediaInfos);
   })
