@@ -39,8 +39,8 @@ void Discover::addAudioInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object>
     NAN_KEY_SET(output, "tags", tagsObject);
   }
 
-  NAN_AUTO_SET(output, "streamId", gst_discoverer_stream_info_get_stream_id(info));
-  NAN_AUTO_SET(output, "language", gst_discoverer_audio_info_get_language(audioInfo));
+  NAN_KEY_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
+  NAN_KEY_SET(output, "language", chararray_to_v8(gst_discoverer_audio_info_get_language(audioInfo)));
   NAN_KEY_SET(output, "channels", Nan::New(gst_discoverer_audio_info_get_channels(audioInfo)));
   NAN_KEY_SET(output, "sampleRate", Nan::New(gst_discoverer_audio_info_get_sample_rate(audioInfo)));
   NAN_KEY_SET(output, "depth", Nan::New(gst_discoverer_audio_info_get_depth(audioInfo)));
@@ -58,14 +58,21 @@ void Discover::addVideoInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object>
     NAN_KEY_SET(output, "tags", tagsObject);
   }
 
-  NAN_AUTO_SET(output, "streamId", gst_discoverer_stream_info_get_stream_id(info));
+  NAN_KEY_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
   NAN_KEY_SET(output, "width", Nan::New(gst_discoverer_video_info_get_width(videoInfo)));
   NAN_KEY_SET(output, "height", Nan::New(gst_discoverer_video_info_get_height(videoInfo)));
   NAN_KEY_SET(output, "depth", Nan::New(gst_discoverer_video_info_get_depth(videoInfo)));
-  NAN_KEY_SET(output, "framerateNum", Nan::New(gst_discoverer_video_info_get_framerate_num(videoInfo)));
-  NAN_KEY_SET(output, "framerateDenom", Nan::New(gst_discoverer_video_info_get_framerate_denom(videoInfo)));
-  NAN_KEY_SET(output, "pixelAspectRatioNum", Nan::New(gst_discoverer_video_info_get_par_num(videoInfo)));
-  NAN_KEY_SET(output, "pixelAspectRatioDenom", Nan::New(gst_discoverer_video_info_get_par_denom(videoInfo)));
+  
+  v8::Local<v8::Object> framerate = Nan::New<v8::Object>();
+  framerate->Set(Nan::New("num").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_framerate_num(videoInfo)));
+  framerate->Set(Nan::New("denom").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_framerate_denom(videoInfo)));
+  NAN_KEY_SET(output, "framerate", framerate);  
+
+  v8::Local<v8::Object> pixelAspectRatio = Nan::New<v8::Object>();
+  pixelAspectRatio->Set(Nan::New("num").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_par_num(videoInfo)));
+  pixelAspectRatio->Set(Nan::New("denom").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_par_denom(videoInfo)));
+  NAN_KEY_SET(output, "pixelAspectRatio", pixelAspectRatio);
+  
   NAN_KEY_SET(output, "interlaced", Nan::New(!!gst_discoverer_video_info_is_interlaced(videoInfo)));
   NAN_KEY_SET(output, "bitrate", Nan::New(gst_discoverer_video_info_get_bitrate(videoInfo)));
   NAN_KEY_SET(output, "image", Nan::New(!!gst_discoverer_video_info_is_image(videoInfo)));
@@ -82,8 +89,8 @@ void Discover::addSubtitleInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Obje
     NAN_KEY_SET(output, "tags", tagsObject);
   }
 
-  NAN_AUTO_SET(output, "streamId", gst_discoverer_stream_info_get_stream_id(info));
-  NAN_AUTO_SET(output, "language", gst_discoverer_subtitle_info_get_language(subInfo));
+  NAN_KEY_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
+  NAN_KEY_SET(output, "language", chararray_to_v8(gst_discoverer_subtitle_info_get_language(subInfo)));
 }
 
 void Discover::addStreamInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object> &output) {
@@ -96,14 +103,14 @@ void Discover::addStreamInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object
   unsigned int streamSz = 0;
   unsigned int streamIt = 0;
 
-  NAN_AUTO_SET(output, "type", gst_discoverer_stream_info_get_stream_type_nick(info));
+  NAN_KEY_SET(output, "type", chararray_to_v8(gst_discoverer_stream_info_get_stream_type_nick(info)));
 
   if (caps != NULL) {
     v8::Local<v8::Object> capsObject = Nan::New<v8::Object>();
 
     for (unsigned long i = 0; i < gst_caps_get_size(caps); i++) {
       GstStructure *structure = gst_caps_get_structure(caps, i);
-      NAN_AUTO_SET(capsObject, "type", gst_structure_get_name(structure));
+      NAN_KEY_SET(capsObject, "type", chararray_to_v8(gst_structure_get_name(structure)));
       gst_structure_foreach(structure, gst_structure_to_v8_value_iterate, (gpointer)&capsObject);
     }
 
@@ -189,8 +196,8 @@ void Discover::processDc(v8::Local<v8::Object> &output) {
   NAN_KEY_SET(duration, "us", Nan::New(times[3]));
 
   NAN_KEY_SET(output, "duration", duration);
-  NAN_KEY_SET(output, "seekable", Nan::New(gst_discoverer_info_get_seekable(info)));
-  NAN_KEY_SET(output, "live", Nan::New(gst_discoverer_info_get_live(info)));
+  NAN_KEY_SET(output, "seekable", Nan::New(!!gst_discoverer_info_get_seekable(info)));
+  NAN_KEY_SET(output, "live", Nan::New(!!gst_discoverer_info_get_live(info)));
   NAN_KEY_SET(output, "topology", topology);
 
   addStreamInfo(sinfo, topology);

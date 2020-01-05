@@ -4,11 +4,6 @@
 #include <nan.h>
 #include <gst/gst.h>
 
-#define NAN_AUTO_SET(object, key, value) object->Set( \
-  Nan::New(key).ToLocalChecked(), \
-  Nan::New(value).ToLocalChecked() \
-)
-
 #define NAN_KEY_SET(object, key, value) object->Set( \
   Nan::New(key).ToLocalChecked(), \
   value \

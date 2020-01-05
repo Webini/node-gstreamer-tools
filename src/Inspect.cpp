@@ -45,7 +45,7 @@ void add_factory_details(GstElementFactory *factory, v8::Local<v8::Object> &outp
   gchar **keys = gst_element_factory_get_metadata_keys(factory);
   if (keys != NULL) {
     for (gchar **k = keys; *k != NULL; ++k) {
-      NAN_AUTO_SET(output, *k, gst_element_factory_get_metadata(factory, *k));
+      NAN_KEY_SET(output, *k, chararray_to_v8(gst_element_factory_get_metadata(factory, *k)));
     }
     g_strfreev (keys);
   }
@@ -90,7 +90,7 @@ void add_pad_templates(GstPluginFeature *feature, GstElementFactory *factory, v8
 
     NAN_KEY_SET(padObject, "direction", Nan::New(padtemplate->direction));
     NAN_KEY_SET(padObject, "presence", Nan::New(padtemplate->presence));
-    NAN_AUTO_SET(padObject, "name", padtemplate->name_template);
+    NAN_KEY_SET(padObject, "name", chararray_to_v8(padtemplate->name_template));
 
     if (padtemplate->static_caps.string) {
       GstCaps *caps = gst_static_caps_get(&padtemplate->static_caps);
@@ -194,7 +194,7 @@ void process_element_factory(GstPluginFeature *feature, v8::Local<v8::Object> &o
     return;
   }
 
-  NAN_AUTO_SET(output, "name", GST_OBJECT_NAME(factory));
+  NAN_KEY_SET(output, "name", chararray_to_v8(GST_OBJECT_NAME(factory)));
   NAN_KEY_SET(output, "rank", Nan::New(gst_plugin_feature_get_rank(GST_PLUGIN_FEATURE(factory))));
 
   GType type = G_OBJECT_TYPE(element);
@@ -226,7 +226,7 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   }
 
   v8::Local<v8::Object> output = Nan::New<v8::Object>();
-  NAN_AUTO_SET(output, "name", gst_plugin_get_name(plugin));
+  NAN_KEY_SET(output, "name", chararray_to_v8(gst_plugin_get_name(plugin)));
   NAN_KEY_SET(output, "description", chararray_to_v8(gst_plugin_get_description(plugin)));
 
   // can be null
