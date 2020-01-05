@@ -159,6 +159,28 @@ void add_preset_list(GstElement * element, v8::Local<v8::Object> &output) {
   }
 }
 
+unsigned int count_hierarchy_depth(GType type, unsigned int previous = 1) {
+  GType parent = g_type_parent(type);
+
+  if (parent) {
+    return count_hierarchy_depth(parent, previous + 1);
+  }
+
+  return previous;
+}
+
+unsigned int add_hierarchy(GType type, v8::Local<v8::Array> &output, unsigned int offset = 0) {
+  unsigned int newOffset = offset;
+  GType parent = g_type_parent(type);
+
+  if (parent) {
+    newOffset = add_hierarchy(parent, output, offset);
+  }
+
+  output->Set(newOffset, Nan::New(g_type_name(type)).ToLocalChecked());
+  return newOffset + 1;
+}
+
 void process_element_factory(GstPluginFeature *feature, v8::Local<v8::Object> &output) {
   GstElementFactory *factory = GST_ELEMENT_FACTORY(feature);
   GstElement *element;
@@ -174,6 +196,12 @@ void process_element_factory(GstPluginFeature *feature, v8::Local<v8::Object> &o
 
   NAN_AUTO_SET(output, "name", GST_OBJECT_NAME(factory));
   NAN_KEY_SET(output, "rank", Nan::New(gst_plugin_feature_get_rank(GST_PLUGIN_FEATURE(factory))));
+
+  GType type = G_OBJECT_TYPE(element);
+  v8::Local<v8::Array> hierarchy = Nan::New<v8::Array>(count_hierarchy_depth(type));
+  NAN_KEY_SET(output, "hierarchy", hierarchy);
+
+  add_hierarchy(type, hierarchy);
   add_factory_details(factory, output);
   add_pad_templates(feature, factory, output);
   add_uri_handler_info(element, output);
