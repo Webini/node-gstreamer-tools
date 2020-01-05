@@ -59,17 +59,28 @@ Local<Value> gchararray_to_v8(const GValue *gv) {
 }
 
 Local<Value> gintrange_to_v8(const GValue *gv) {
-  Local<Array> array = Nan::New<Array>(2);
-  array->Set(0, Nan::New(gst_value_get_int_range_min(gv)));
-  array->Set(1, Nan::New(gst_value_get_int_range_max(gv)));
-  return array;
+  Local<Object> object = Nan::New<Object>();
+  object->Set(Nan::New("min").ToLocalChecked(), Nan::New(gst_value_get_int_range_min(gv)));
+  object->Set(Nan::New("max").ToLocalChecked(), Nan::New(gst_value_get_int_range_max(gv)));
+  return object;
 }
 
-Local<Value> gintfraction_to_v8(const GValue *gv) {
-  Local<Array> array = Nan::New<Array>(2);
-  array->Set(0, gvalue_to_v8(gst_value_get_fraction_range_min(gv)));
-  array->Set(1, gvalue_to_v8(gst_value_get_fraction_range_max(gv)));
-  return array;
+Local<Value> gintfraction_range_to_v8(const GValue *gv) {
+  Local<Object> object = Nan::New<Object>();
+  object->Set(Nan::New("min").ToLocalChecked(), gvalue_to_v8(gst_value_get_fraction_range_min(gv)));
+  object->Set(Nan::New("max").ToLocalChecked(), gvalue_to_v8(gst_value_get_fraction_range_min(gv)));
+  return object;
+}
+
+Local<Value> gfraction_to_v8(const GValue *gv) {
+  Local<Object> object = Nan::New<Object>();
+  object->Set(Nan::New("num").ToLocalChecked(), Nan::New(gst_value_get_fraction_numerator(gv)));
+  object->Set(Nan::New("denom").ToLocalChecked(), Nan::New(gst_value_get_fraction_denominator(gv)));
+  return object;
+}
+
+Local<Value> gbitmask_to_v8(const GValue *gv) {
+  return Nan::New((unsigned int)gst_value_get_bitmask(gv));
 }
 
 Local<Value> glist_to_v8(const GValue *gv) {
@@ -109,8 +120,12 @@ Local<Value> gvalue_to_v8(const GValue *gv) {
     return glist_to_v8(gv);
   } else if (GST_VALUE_HOLDS_INT_RANGE(gv)) {
     return gintrange_to_v8(gv);
+  } else if (GST_VALUE_HOLDS_FRACTION(gv)) {
+    return gfraction_to_v8(gv);
   } else if (GST_VALUE_HOLDS_FRACTION_RANGE(gv)) {
-    return gintfraction_to_v8(gv);
+    return gintfraction_range_to_v8(gv);
+  } else if (GST_VALUE_HOLDS_BITMASK(gv)) {
+    return gbitmask_to_v8(gv);
   } else if(GST_VALUE_HOLDS_ARRAY(gv)) {
     return gstvaluearray_to_v8(gv);
   } else if(GST_VALUE_HOLDS_BUFFER(gv)) {
@@ -131,13 +146,14 @@ Local<Value> gvalue_to_v8(const GValue *gv) {
     return result;
   }
 
-  // printf("Value is of unhandled type %s\n", G_VALUE_TYPE_NAME(gv));
+  printf("Value is of unhandled type %s\n", G_VALUE_TYPE_NAME(gv));
 
   /* Attempt to transform it into a GValue of type STRING */
   if(g_value_type_transformable (G_VALUE_TYPE(gv), G_TYPE_STRING)) {
     GValue b = G_VALUE_INIT;
     g_value_init(&b, G_TYPE_STRING);
     g_value_transform(gv, &b);
+
     return gchararray_to_v8(&b);
   }
 
