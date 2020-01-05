@@ -49,7 +49,7 @@ gst
 
 ## Constants
 
-### features[].padTemplates[].direction
+### features[].pads[].direction
 https://gstreamer.freedesktop.org/documentation/gstreamer/gstpad.html#GstPadDirection   
 
 Value | Description
@@ -59,7 +59,7 @@ Value | Description
 2     | sink
 
 
-### features[].padTemplates[].presence
+### features[].pads[].presence
 
 https://gstreamer.freedesktop.org/documentation/gstreamer/gstpadtemplate.html?gi-language=c#GstPadPresence
 
