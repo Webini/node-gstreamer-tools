@@ -199,14 +199,17 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
   v8::Local<v8::Object> output = Nan::New<v8::Object>();
   NAN_AUTO_SET(output, "name", gst_plugin_get_name(plugin));
-  NAN_AUTO_SET(output, "description", gst_plugin_get_description(plugin));
-  NAN_AUTO_SET(output, "filename", gst_plugin_get_filename(plugin));
-  NAN_AUTO_SET(output, "releaseDate", gst_plugin_get_release_date_string(plugin));
-  NAN_AUTO_SET(output, "version", gst_plugin_get_version(plugin));
-  NAN_AUTO_SET(output, "license", gst_plugin_get_license(plugin));
-  NAN_AUTO_SET(output, "source", gst_plugin_get_source(plugin));
-  NAN_AUTO_SET(output, "binaryPackage", gst_plugin_get_package(plugin));
-  NAN_AUTO_SET(output, "originUrl", gst_plugin_get_origin(plugin));
+  NAN_KEY_SET(output, "description", chararray_to_v8(gst_plugin_get_description(plugin)));
+
+  // can be null
+  NAN_KEY_SET(output, "filename", chararray_to_v8(gst_plugin_get_filename(plugin)));
+  NAN_KEY_SET(output, "releaseDate", chararray_to_v8(gst_plugin_get_release_date_string(plugin)));
+  
+  NAN_KEY_SET(output, "version", chararray_to_v8(gst_plugin_get_version(plugin)));
+  NAN_KEY_SET(output, "license", chararray_to_v8(gst_plugin_get_license(plugin)));
+  NAN_KEY_SET(output, "source", chararray_to_v8(gst_plugin_get_source(plugin)));
+  NAN_KEY_SET(output, "binaryPackage", chararray_to_v8(gst_plugin_get_package(plugin)));
+  NAN_KEY_SET(output, "originUrl", chararray_to_v8(gst_plugin_get_origin(plugin)));
   NAN_KEY_SET(output, "backlisted", Nan::New(GST_OBJECT_FLAG_IS_SET(plugin, GST_PLUGIN_FLAG_BLACKLISTED)));
 
   GList *features, *orig_features;

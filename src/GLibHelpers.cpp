@@ -46,11 +46,16 @@ Local<Value> gstvaluearray_to_v8(const GValue *gv) {
   return array;
 }
 
+Local<Value> chararray_to_v8(const char *str) {
+  if (!str) {
+    return Nan::Null();
+  }
+  return Nan::New(str).ToLocalChecked();
+}
+
 Local<Value> gchararray_to_v8(const GValue *gv) {
   const char *str = g_value_get_string(gv);
-  if(!str)
-    return Nan::Null();
-  return Nan::New(str).ToLocalChecked();
+  return chararray_to_v8(str);
 }
 
 Local<Value> gintrange_to_v8(const GValue *gv) {
