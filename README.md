@@ -1,7 +1,7 @@
-INSTALLATION
+Installation
 ============
 Support only linux yet. Contributions are welcome.  
-System dependencies : `libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev`
+System dependencies : `libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev` (>= 1.14)
 
 To install run `npm i node-gstreamer-tools`
 
