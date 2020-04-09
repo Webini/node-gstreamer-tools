@@ -1,6 +1,6 @@
 {
   "name": "node-gstreamer-tools",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Simple wrapper for gstreamer inspection and discovering ",
   "main": "index.js",
   "scripts": {
