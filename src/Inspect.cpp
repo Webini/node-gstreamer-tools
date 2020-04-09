@@ -51,12 +51,12 @@ void add_factory_details(GstElementFactory *factory, v8::Local<v8::Object> &outp
   }
 }
 
-/** doing https://github.com/GStreamer/gstreamer/blob/master/tools/gst-inspect.c#L160 **/
-void add_caps(const GstCaps *caps, v8::Local<v8::Object> &output) {
+v8::Local<v8::Array> add_caps(const GstCaps *caps) {
   if (caps == NULL || gst_caps_is_empty(caps)) {
-    return;
+    return Nan::New<v8::Array>(0);
   }
 
+  v8::Local<v8::Array> capsList = Nan::New<v8::Array>(gst_caps_get_size(caps));
   for (unsigned long i = 0; i < gst_caps_get_size(caps); i++) {
     GstStructure *structure = gst_caps_get_structure(caps, i);
     GstCapsFeatures *features = gst_caps_get_features(caps, i);
@@ -65,14 +65,17 @@ void add_caps(const GstCaps *caps, v8::Local<v8::Object> &output) {
     v8::Local<v8::Array> featuresArr = Nan::New<v8::Array>(featuresLen);
 
     NAN_KEY_SET(capsObject, "features", featuresArr);
-    NAN_KEY_SET(output, gst_structure_get_name(structure), capsObject);
+    NAN_KEY_SET(capsObject, "mimetype", chararray_to_v8(gst_structure_get_name(structure)));
 
     for (unsigned int j = 0; j < featuresLen; j++) {
       featuresArr->Set(j, Nan::New(gst_caps_features_get_nth(features, j)).ToLocalChecked());
     }
 
     gst_structure_foreach(structure, gst_structure_to_v8_value_iterate, (gpointer)&capsObject);
+    capsList->Set(i, capsObject);
   }
+
+  return capsList;
 }
 
 void add_pad_templates(GstPluginFeature *feature, GstElementFactory *factory, v8::Local<v8::Object> &output) {
@@ -94,16 +97,14 @@ void add_pad_templates(GstPluginFeature *feature, GstElementFactory *factory, v8
 
     if (padtemplate->static_caps.string) {
       GstCaps *caps = gst_static_caps_get(&padtemplate->static_caps);
-      v8::Local<v8::Object> capsObject = Nan::New<v8::Object>();
-      NAN_KEY_SET(padObject, "capabilities", capsObject);
       if (caps != NULL) {
         NAN_KEY_SET(padObject, "any", Nan::New((bool)gst_caps_is_any(caps)));
-        add_caps(caps, capsObject);
+        NAN_KEY_SET(padObject, "capabilities", add_caps(caps));
       }
       gst_caps_unref(caps);
     }
 
-    arr->Set(i, padObject);
+    Nan::Set(arr, i, padObject);
   }
 
   NAN_KEY_SET(output, "pads", arr);
@@ -208,7 +209,7 @@ void process_element_factory(GstPluginFeature *feature, v8::Local<v8::Object> &o
   add_preset_list(element, output);
 
   gst_object_unref(element);
-  // gst_object_unref(factory);
+  //gst_object_unref(factory);
 }
 
 void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -245,6 +246,8 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
           gst_registry_get_feature_list_by_plugin(gst_registry_get(),
           gst_plugin_get_name(plugin));
 
+  gst_object_unref(plugin);
+
   v8::Local<v8::Array> arr = Nan::New<v8::Array>(count_features(features));
   NAN_KEY_SET(output, "features", arr);
 
@@ -265,7 +268,7 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     // gst_object_unref(feature);
     i++;
   }
-
+  
   gst_plugin_feature_list_free(orig_features);
   info.GetReturnValue().Set(output);
 }
