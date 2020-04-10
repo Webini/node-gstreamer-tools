@@ -6,16 +6,23 @@ Discover::Discover(Nan::Callback* callback, unsigned int timeout, const char *fi
 }
 
 Discover::~Discover() {
+  clean();
+  g_free((gpointer)filepath);
+}
+
+void Discover::clean() {
   if (dc != NULL) {
     g_object_unref(dc);
+    dc = NULL;
   }
   if (gerr != NULL) {
     g_clear_error(&gerr);
+    gerr = NULL;
   }
   if (info != NULL) {
     gst_discoverer_info_unref(info);
+    info = NULL;
   }
-  g_free((gpointer)filepath);
 }
 
 void Discover::Execute() {
@@ -165,11 +172,13 @@ void Discover::processDc(v8::Local<v8::Object> &output) {
   GstDiscovererStreamInfo *sinfo;
 
   if (info == NULL) {
+    error = "Info not set";
     return;
   }
 
   result = gst_discoverer_info_get_result(info);
   if (result != GST_DISCOVERER_OK) {
+    error = "Discoverer not ok";
     return;
   }
 
@@ -218,5 +227,6 @@ void Discover::HandleOKCallback() {
     argv[1] = output;
   }
 
+  clean();
   callback->Call(2, argv, async_resource);
 }

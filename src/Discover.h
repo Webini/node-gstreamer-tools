@@ -21,6 +21,7 @@ class Discover : public Nan::AsyncWorker {
     GstDiscovererInfo *info;
     GError *gerr;
 
+    void clean();
     void processDc(v8::Local<v8::Object> &output);
     void addStreamInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object> &output);
     void addAudioInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object> &output);
