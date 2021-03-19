@@ -60,22 +60,22 @@ Local<Value> gchararray_to_v8(const GValue *gv) {
 
 Local<Value> gintrange_to_v8(const GValue *gv) {
   Local<Object> object = Nan::New<Object>();
-  object->Set(Nan::New("min").ToLocalChecked(), Nan::New(gst_value_get_int_range_min(gv)));
-  object->Set(Nan::New("max").ToLocalChecked(), Nan::New(gst_value_get_int_range_max(gv)));
+  OBJECT_SET(object, "min", Nan::New(gst_value_get_int_range_min(gv)));
+  OBJECT_SET(object, "max", Nan::New(gst_value_get_int_range_max(gv)));
   return object;
 }
 
 Local<Value> gintfraction_range_to_v8(const GValue *gv) {
   Local<Object> object = Nan::New<Object>();
-  object->Set(Nan::New("min").ToLocalChecked(), gvalue_to_v8(gst_value_get_fraction_range_min(gv)));
-  object->Set(Nan::New("max").ToLocalChecked(), gvalue_to_v8(gst_value_get_fraction_range_min(gv)));
+  OBJECT_SET(object, "min", gvalue_to_v8(gst_value_get_fraction_range_min(gv)));
+  OBJECT_SET(object, "max", gvalue_to_v8(gst_value_get_fraction_range_min(gv)));
   return object;
 }
 
 Local<Value> gfraction_to_v8(const GValue *gv) {
   Local<Object> object = Nan::New<Object>();
-  object->Set(Nan::New("num").ToLocalChecked(), Nan::New(gst_value_get_fraction_numerator(gv)));
-  object->Set(Nan::New("denom").ToLocalChecked(), Nan::New(gst_value_get_fraction_denominator(gv)));
+  OBJECT_SET(object, "num", Nan::New(gst_value_get_fraction_numerator(gv)));
+  OBJECT_SET(object, "denom", Nan::New(gst_value_get_fraction_denominator(gv)));
   return object;
 }
 
@@ -194,8 +194,9 @@ void gst_tags_to_v8_iterate(const GstTagList *tags, const gchar *tag, gpointer d
     return;
   }
 
-  (*obj)->Set(
-    Nan::New(gst_tag_get_nick(tag)).ToLocalChecked(),
+  OBJECT_SET(
+  (*obj),
+    gst_tag_get_nick(tag),
     gvalue_to_v8(&val)
   );
 
@@ -205,8 +206,9 @@ void gst_tags_to_v8_iterate(const GstTagList *tags, const gchar *tag, gpointer d
 
 gboolean gst_structure_to_v8_value_iterate(GQuark field_id, const GValue *value, gpointer data) {
   Local<Object> *obj = (Local<Object> *)data;
-  (*obj)->Set(
-    Nan::New(g_quark_to_string(field_id)).ToLocalChecked(),
+  OBJECT_SET(
+    (*obj),
+    g_quark_to_string(field_id),
     gvalue_to_v8(value)
   );
   return true;

@@ -4,10 +4,8 @@
 #include <nan.h>
 #include <gst/gst.h>
 
-#define NAN_KEY_SET(object, key, value) object->Set( \
-  Nan::New(key).ToLocalChecked(), \
-  value \
-)
+#define OBJECT_SET(object, key, value) Nan::Set(object, Nan::New(key).ToLocalChecked(), value)
+#define ARRAY_SET(array, key, value) Nan::Set(array, key, value)
 
 using namespace v8;
 

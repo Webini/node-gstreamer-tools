@@ -17,7 +17,7 @@ void GetPlugins(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   unsigned long i = 0;
   for (GList *p = plugins; p; p = p->next, i++) {
     GstPlugin *plugin = (GstPlugin *)(p->data);
-    arr->Set(i, Nan::New(gst_plugin_get_name(plugin)).ToLocalChecked());
+    ARRAY_SET(arr, i, Nan::New(gst_plugin_get_name(plugin)).ToLocalChecked());
   }
 
   gst_plugin_list_free(plugins);
@@ -45,7 +45,7 @@ void add_factory_details(GstElementFactory *factory, v8::Local<v8::Object> &outp
   gchar **keys = gst_element_factory_get_metadata_keys(factory);
   if (keys != NULL) {
     for (gchar **k = keys; *k != NULL; ++k) {
-      NAN_KEY_SET(output, *k, chararray_to_v8(gst_element_factory_get_metadata(factory, *k)));
+      OBJECT_SET(output, *k, chararray_to_v8(gst_element_factory_get_metadata(factory, *k)));
     }
     g_strfreev (keys);
   }
@@ -64,15 +64,15 @@ v8::Local<v8::Array> add_caps(const GstCaps *caps) {
     unsigned int featuresLen = gst_caps_features_get_size(features);
     v8::Local<v8::Array> featuresArr = Nan::New<v8::Array>(featuresLen);
 
-    NAN_KEY_SET(capsObject, "features", featuresArr);
-    NAN_KEY_SET(capsObject, "mimetype", chararray_to_v8(gst_structure_get_name(structure)));
+    OBJECT_SET(capsObject, "features", featuresArr);
+    OBJECT_SET(capsObject, "mimetype", chararray_to_v8(gst_structure_get_name(structure)));
 
     for (unsigned int j = 0; j < featuresLen; j++) {
-      featuresArr->Set(j, Nan::New(gst_caps_features_get_nth(features, j)).ToLocalChecked());
+      ARRAY_SET(featuresArr, j, Nan::New(gst_caps_features_get_nth(features, j)).ToLocalChecked());
     }
 
     gst_structure_foreach(structure, gst_structure_to_v8_value_iterate, (gpointer)&capsObject);
-    capsList->Set(i, capsObject);
+    ARRAY_SET(capsList, i, capsObject);
   }
 
   return capsList;
@@ -91,15 +91,15 @@ void add_pad_templates(GstPluginFeature *feature, GstElementFactory *factory, v8
     v8::Local<v8::Object> padObject = Nan::New<v8::Object>();
     GstStaticPadTemplate *padtemplate = (GstStaticPadTemplate *)(pad->data);
 
-    NAN_KEY_SET(padObject, "direction", Nan::New(padtemplate->direction));
-    NAN_KEY_SET(padObject, "presence", Nan::New(padtemplate->presence));
-    NAN_KEY_SET(padObject, "name", chararray_to_v8(padtemplate->name_template));
+    OBJECT_SET(padObject, "direction", Nan::New(padtemplate->direction));
+    OBJECT_SET(padObject, "presence", Nan::New(padtemplate->presence));
+    OBJECT_SET(padObject, "name", chararray_to_v8(padtemplate->name_template));
 
     if (padtemplate->static_caps.string) {
       GstCaps *caps = gst_static_caps_get(&padtemplate->static_caps);
       if (caps != NULL) {
-        NAN_KEY_SET(padObject, "any", Nan::New((bool)gst_caps_is_any(caps)));
-        NAN_KEY_SET(padObject, "capabilities", add_caps(caps));
+        OBJECT_SET(padObject, "any", Nan::New((bool)gst_caps_is_any(caps)));
+        OBJECT_SET(padObject, "capabilities", add_caps(caps));
       }
       gst_caps_unref(caps);
     }
@@ -107,7 +107,7 @@ void add_pad_templates(GstPluginFeature *feature, GstElementFactory *factory, v8
     Nan::Set(arr, i, padObject);
   }
 
-  NAN_KEY_SET(output, "pads", arr);
+  OBJECT_SET(output, "pads", arr);
 }
 
 void add_uri_handler_info(GstElement *element, v8::Local<v8::Object> &output) {
@@ -118,7 +118,7 @@ void add_uri_handler_info(GstElement *element, v8::Local<v8::Object> &output) {
   v8::Local<v8::Object> uriInfos = Nan::New<v8::Object>();
   const gchar *const *uri_protocols;
 
-  NAN_KEY_SET(uriInfos, "type", Nan::New(gst_uri_handler_get_uri_type(GST_URI_HANDLER(element))));
+  OBJECT_SET(uriInfos, "type", Nan::New(gst_uri_handler_get_uri_type(GST_URI_HANDLER(element))));
   uri_protocols = gst_uri_handler_get_protocols(GST_URI_HANDLER(element));
 
   if (uri_protocols && *uri_protocols) {
@@ -128,13 +128,13 @@ void add_uri_handler_info(GstElement *element, v8::Local<v8::Object> &output) {
     v8::Local<v8::Array> arr = Nan::New<v8::Array>(uriLen);
     unsigned long i = 0;
     for (; *uri_protocols != NULL; uri_protocols++, i++) {
-      arr->Set(i, Nan::New(*uri_protocols).ToLocalChecked());
+      ARRAY_SET(arr, i, Nan::New(*uri_protocols).ToLocalChecked());
     }
     
-    NAN_KEY_SET(uriInfos, "protocols", arr);
+    OBJECT_SET(uriInfos, "protocols", arr);
   }
   
-  NAN_KEY_SET(output, "uriHandler", uriInfos);
+  OBJECT_SET(output, "uriHandler", uriInfos);
 }
 
 void add_preset_list(GstElement * element, v8::Local<v8::Object> &output) {
@@ -152,10 +152,10 @@ void add_preset_list(GstElement * element, v8::Local<v8::Object> &output) {
     v8::Local<v8::Array> arr = Nan::New<v8::Array>(presetsLen);
     unsigned long i = 0;
     for (gchar **preset = presets; *preset != NULL; preset++, i++) {
-      arr->Set(i, Nan::New(*preset).ToLocalChecked());
+      ARRAY_SET(arr, i, Nan::New(*preset).ToLocalChecked());
     }
     
-    NAN_KEY_SET(output, "presets", arr);
+    OBJECT_SET(output, "presets", arr);
     g_strfreev (presets);
   }
 }
@@ -178,7 +178,7 @@ unsigned int add_hierarchy(GType type, v8::Local<v8::Array> &output, unsigned in
     newOffset = add_hierarchy(parent, output, offset);
   }
 
-  output->Set(newOffset, Nan::New(g_type_name(type)).ToLocalChecked());
+  ARRAY_SET(output, newOffset, Nan::New(g_type_name(type)).ToLocalChecked());
   return newOffset + 1;
 }
 
@@ -195,12 +195,12 @@ void process_element_factory(GstPluginFeature *feature, v8::Local<v8::Object> &o
     return;
   }
 
-  NAN_KEY_SET(output, "name", chararray_to_v8(GST_OBJECT_NAME(factory)));
-  NAN_KEY_SET(output, "rank", Nan::New(gst_plugin_feature_get_rank(GST_PLUGIN_FEATURE(factory))));
+  OBJECT_SET(output, "name", chararray_to_v8(GST_OBJECT_NAME(factory)));
+  OBJECT_SET(output, "rank", Nan::New(gst_plugin_feature_get_rank(GST_PLUGIN_FEATURE(factory))));
 
   GType type = G_OBJECT_TYPE(element);
   v8::Local<v8::Array> hierarchy = Nan::New<v8::Array>(count_hierarchy_depth(type));
-  NAN_KEY_SET(output, "hierarchy", hierarchy);
+  OBJECT_SET(output, "hierarchy", hierarchy);
 
   add_hierarchy(type, hierarchy);
   add_factory_details(factory, output);
@@ -227,19 +227,19 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   }
 
   v8::Local<v8::Object> output = Nan::New<v8::Object>();
-  NAN_KEY_SET(output, "name", chararray_to_v8(gst_plugin_get_name(plugin)));
-  NAN_KEY_SET(output, "description", chararray_to_v8(gst_plugin_get_description(plugin)));
+  OBJECT_SET(output, "name", chararray_to_v8(gst_plugin_get_name(plugin)));
+  OBJECT_SET(output, "description", chararray_to_v8(gst_plugin_get_description(plugin)));
 
   // can be null
-  NAN_KEY_SET(output, "filename", chararray_to_v8(gst_plugin_get_filename(plugin)));
-  NAN_KEY_SET(output, "releaseDate", chararray_to_v8(gst_plugin_get_release_date_string(plugin)));
+  OBJECT_SET(output, "filename", chararray_to_v8(gst_plugin_get_filename(plugin)));
+  OBJECT_SET(output, "releaseDate", chararray_to_v8(gst_plugin_get_release_date_string(plugin)));
   
-  NAN_KEY_SET(output, "version", chararray_to_v8(gst_plugin_get_version(plugin)));
-  NAN_KEY_SET(output, "license", chararray_to_v8(gst_plugin_get_license(plugin)));
-  NAN_KEY_SET(output, "source", chararray_to_v8(gst_plugin_get_source(plugin)));
-  NAN_KEY_SET(output, "binaryPackage", chararray_to_v8(gst_plugin_get_package(plugin)));
-  NAN_KEY_SET(output, "originUrl", chararray_to_v8(gst_plugin_get_origin(plugin)));
-  NAN_KEY_SET(output, "backlisted", Nan::New(GST_OBJECT_FLAG_IS_SET(plugin, GST_PLUGIN_FLAG_BLACKLISTED)));
+  OBJECT_SET(output, "version", chararray_to_v8(gst_plugin_get_version(plugin)));
+  OBJECT_SET(output, "license", chararray_to_v8(gst_plugin_get_license(plugin)));
+  OBJECT_SET(output, "source", chararray_to_v8(gst_plugin_get_source(plugin)));
+  OBJECT_SET(output, "binaryPackage", chararray_to_v8(gst_plugin_get_package(plugin)));
+  OBJECT_SET(output, "originUrl", chararray_to_v8(gst_plugin_get_origin(plugin)));
+  OBJECT_SET(output, "backlisted", Nan::New(GST_OBJECT_FLAG_IS_SET(plugin, GST_PLUGIN_FLAG_BLACKLISTED)));
 
   GList *features, *orig_features;
   orig_features = features =
@@ -249,7 +249,7 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   gst_object_unref(plugin);
 
   v8::Local<v8::Array> arr = Nan::New<v8::Array>(count_features(features));
-  NAN_KEY_SET(output, "features", arr);
+  OBJECT_SET(output, "features", arr);
 
   for (unsigned long i = 0; features != NULL;) {
     if (features->data == NULL) {
@@ -263,7 +263,7 @@ void Inspect(const Nan::FunctionCallbackInfo<v8::Value>& info) {
       process_element_factory(feature, featureObject);
     }
 
-    arr->Set(i, featureObject);
+    ARRAY_SET(arr, i, featureObject);
     features = g_list_next(features);
     // gst_object_unref(feature);
     i++;

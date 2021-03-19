@@ -3,20 +3,20 @@
 #include <gst/gst.h>
 #include "Discover.h"
 
-void DiscoverInit(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  if (info.Length() < 3) {
+void DiscoverInit(const Nan::FunctionCallbackInfo<v8::Value>& args) {
+  if (args.Length() < 3) {
     Nan::ThrowTypeError("Wrong number of arguments");
     return;
   }
 
-  if (!info[1]->IsNumber()) {
+  if (!args[1]->IsNumber()) {
     Nan::ThrowTypeError("Wrong arguments");
     return;
   }
   
-  Nan::Utf8String filepath(info[0]);
-  double timeout = Nan::To<unsigned int>(info[1]).FromJust();
-  Nan::Callback* callback = new Nan::Callback(Nan::To<v8::Function>(info[2]).ToLocalChecked());
+  Nan::Utf8String filepath(args[0]);
+  double timeout = Nan::To<unsigned int>(args[1]).FromJust();
+  Nan::Callback* callback = new Nan::Callback(Nan::To<v8::Function>(args[2]).ToLocalChecked());
 
   Nan::AsyncQueueWorker(new Discover(callback, timeout, *filepath));
 }

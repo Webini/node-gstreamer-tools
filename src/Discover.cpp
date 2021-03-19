@@ -26,7 +26,7 @@ void Discover::clean() {
 }
 
 void Discover::Execute() {
-  dc = gst_discoverer_new(timeout * GST_SECOND, &gerr);
+  dc = gst_discoverer_new(timeout *GST_SECOND, &gerr);
 
   if (G_UNLIKELY(dc == NULL)) {
     error = "Cannot initialize discoverer";
@@ -43,16 +43,16 @@ void Discover::addAudioInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object>
   if (tags != NULL) {
     v8::Local<v8::Object> tagsObject = Nan::New<v8::Object>();
     gst_tag_list_foreach(tags, gst_tags_to_v8_iterate, (gpointer)&tagsObject);
-    NAN_KEY_SET(output, "tags", tagsObject);
+    OBJECT_SET(output, "tags", tagsObject);
   }
 
-  NAN_KEY_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
-  NAN_KEY_SET(output, "language", chararray_to_v8(gst_discoverer_audio_info_get_language(audioInfo)));
-  NAN_KEY_SET(output, "channels", Nan::New(gst_discoverer_audio_info_get_channels(audioInfo)));
-  NAN_KEY_SET(output, "sampleRate", Nan::New(gst_discoverer_audio_info_get_sample_rate(audioInfo)));
-  NAN_KEY_SET(output, "depth", Nan::New(gst_discoverer_audio_info_get_depth(audioInfo)));
-  NAN_KEY_SET(output, "bitrate", Nan::New(gst_discoverer_audio_info_get_bitrate(audioInfo)));
-  NAN_KEY_SET(output, "maxBitrate", Nan::New(gst_discoverer_audio_info_get_max_bitrate(audioInfo)));
+  OBJECT_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
+  OBJECT_SET(output, "language", chararray_to_v8(gst_discoverer_audio_info_get_language(audioInfo)));
+  OBJECT_SET(output, "channels", Nan::New(gst_discoverer_audio_info_get_channels(audioInfo)));
+  OBJECT_SET(output, "sampleRate", Nan::New(gst_discoverer_audio_info_get_sample_rate(audioInfo)));
+  OBJECT_SET(output, "depth", Nan::New(gst_discoverer_audio_info_get_depth(audioInfo)));
+  OBJECT_SET(output, "bitrate", Nan::New(gst_discoverer_audio_info_get_bitrate(audioInfo)));
+  OBJECT_SET(output, "maxBitrate", Nan::New(gst_discoverer_audio_info_get_max_bitrate(audioInfo)));
 }
 
 void Discover::addVideoInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object> &output) {
@@ -62,28 +62,28 @@ void Discover::addVideoInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object>
   if (tags != NULL) {
     v8::Local<v8::Object> tagsObject = Nan::New<v8::Object>();
     gst_tag_list_foreach(tags, gst_tags_to_v8_iterate, (gpointer)&tagsObject);
-    NAN_KEY_SET(output, "tags", tagsObject);
+    OBJECT_SET(output, "tags", tagsObject);
   }
 
-  NAN_KEY_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
-  NAN_KEY_SET(output, "width", Nan::New(gst_discoverer_video_info_get_width(videoInfo)));
-  NAN_KEY_SET(output, "height", Nan::New(gst_discoverer_video_info_get_height(videoInfo)));
-  NAN_KEY_SET(output, "depth", Nan::New(gst_discoverer_video_info_get_depth(videoInfo)));
+  OBJECT_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
+  OBJECT_SET(output, "width", Nan::New(gst_discoverer_video_info_get_width(videoInfo)));
+  OBJECT_SET(output, "height", Nan::New(gst_discoverer_video_info_get_height(videoInfo)));
+  OBJECT_SET(output, "depth", Nan::New(gst_discoverer_video_info_get_depth(videoInfo)));
   
   v8::Local<v8::Object> framerate = Nan::New<v8::Object>();
-  framerate->Set(Nan::New("num").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_framerate_num(videoInfo)));
-  framerate->Set(Nan::New("denom").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_framerate_denom(videoInfo)));
-  NAN_KEY_SET(output, "framerate", framerate);  
+  OBJECT_SET(framerate, "num", Nan::New(gst_discoverer_video_info_get_framerate_num(videoInfo)));
+  OBJECT_SET(framerate, "denom", Nan::New(gst_discoverer_video_info_get_framerate_denom(videoInfo)));
+  OBJECT_SET(output, "framerate", framerate);
 
   v8::Local<v8::Object> pixelAspectRatio = Nan::New<v8::Object>();
-  pixelAspectRatio->Set(Nan::New("num").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_par_num(videoInfo)));
-  pixelAspectRatio->Set(Nan::New("denom").ToLocalChecked(), Nan::New(gst_discoverer_video_info_get_par_denom(videoInfo)));
-  NAN_KEY_SET(output, "pixelAspectRatio", pixelAspectRatio);
+  OBJECT_SET(pixelAspectRatio, "num", Nan::New(gst_discoverer_video_info_get_par_num(videoInfo)));
+  OBJECT_SET(pixelAspectRatio, "denom", Nan::New(gst_discoverer_video_info_get_par_denom(videoInfo)));
+  OBJECT_SET(output, "pixelAspectRatio", pixelAspectRatio);
   
-  NAN_KEY_SET(output, "interlaced", Nan::New(!!gst_discoverer_video_info_is_interlaced(videoInfo)));
-  NAN_KEY_SET(output, "bitrate", Nan::New(gst_discoverer_video_info_get_bitrate(videoInfo)));
-  NAN_KEY_SET(output, "image", Nan::New(!!gst_discoverer_video_info_is_image(videoInfo)));
-  NAN_KEY_SET(output, "maxBitrate", Nan::New(gst_discoverer_video_info_get_max_bitrate(videoInfo)));
+  OBJECT_SET(output, "interlaced", Nan::New(!!gst_discoverer_video_info_is_interlaced(videoInfo)));
+  OBJECT_SET(output, "bitrate", Nan::New(gst_discoverer_video_info_get_bitrate(videoInfo)));
+  OBJECT_SET(output, "image", Nan::New(!!gst_discoverer_video_info_is_image(videoInfo)));
+  OBJECT_SET(output, "maxBitrate", Nan::New(gst_discoverer_video_info_get_max_bitrate(videoInfo)));
 }
 
 void Discover::addSubtitleInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object> &output) {
@@ -93,11 +93,11 @@ void Discover::addSubtitleInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Obje
   if (tags != NULL) {
     v8::Local<v8::Object> tagsObject = Nan::New<v8::Object>();
     gst_tag_list_foreach(tags, gst_tags_to_v8_iterate, (gpointer)&tagsObject);
-    NAN_KEY_SET(output, "tags", tagsObject);
+    OBJECT_SET(output, "tags", tagsObject);
   }
 
-  NAN_KEY_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
-  NAN_KEY_SET(output, "language", chararray_to_v8(gst_discoverer_subtitle_info_get_language(subInfo)));
+  OBJECT_SET(output, "streamId", chararray_to_v8(gst_discoverer_stream_info_get_stream_id(info)));
+  OBJECT_SET(output, "language", chararray_to_v8(gst_discoverer_subtitle_info_get_language(subInfo)));
 }
 
 void Discover::addStreamInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object> &output) {
@@ -110,18 +110,18 @@ void Discover::addStreamInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object
   unsigned int streamSz = 0;
   unsigned int streamIt = 0;
 
-  NAN_KEY_SET(output, "type", chararray_to_v8(gst_discoverer_stream_info_get_stream_type_nick(info)));
+  OBJECT_SET(output, "type", chararray_to_v8(gst_discoverer_stream_info_get_stream_type_nick(info)));
 
   if (caps != NULL) {
     v8::Local<v8::Object> capsObject = Nan::New<v8::Object>();
 
     for (unsigned long i = 0; i < gst_caps_get_size(caps); i++) {
       GstStructure *structure = gst_caps_get_structure(caps, i);
-      NAN_KEY_SET(capsObject, "type", chararray_to_v8(gst_structure_get_name(structure)));
+      OBJECT_SET(capsObject, "type", chararray_to_v8(gst_structure_get_name(structure)));
       gst_structure_foreach(structure, gst_structure_to_v8_value_iterate, (gpointer)&capsObject);
     }
 
-    NAN_KEY_SET(output, "codec", capsObject);
+    OBJECT_SET(output, "codec", capsObject);
   }
   
   if (GST_IS_DISCOVERER_AUDIO_INFO(info)) {
@@ -146,7 +146,7 @@ void Discover::addStreamInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object
       v8::Local<v8::Object> infoObject = Nan::New<v8::Object>();
       GstDiscovererStreamInfo *tmpInf = (GstDiscovererStreamInfo *)stream->data;
       addStreamInfo(tmpInf, infoObject);
-      arr->Set(streamIt, infoObject);
+      ARRAY_SET(arr,streamIt, infoObject);
     }
 
     gst_discoverer_stream_info_list_free(streams);
@@ -159,11 +159,11 @@ void Discover::addStreamInfo(GstDiscovererStreamInfo *info, v8::Local<v8::Object
   ) {
     v8::Local<v8::Object> infoObject = Nan::New<v8::Object>();
     addStreamInfo(next, infoObject);
-    arr->Set(streamIt, infoObject);
+    ARRAY_SET(arr, streamIt, infoObject);
   }
 
   if (streamSz > 0) {
-    output->Set(Nan::New("streams").ToLocalChecked(), arr);
+    OBJECT_SET(output, "streams", arr);
   }
 }
 
@@ -194,20 +194,20 @@ void Discover::processDc(v8::Local<v8::Object> &output) {
   if (tags != NULL) {
     v8::Local<v8::Object> tagsObject = Nan::New<v8::Object>();
     gst_tag_list_foreach(tags, gst_tags_to_v8_iterate, (gpointer)&tagsObject);
-    NAN_KEY_SET(output, "tags", tagsObject);
+    OBJECT_SET(output, "tags", tagsObject);
   }
 
   v8::Local<v8::Object> duration = Nan::New<v8::Object>();
   unsigned int times[] = { GST_TIME_ARGS(gst_discoverer_info_get_duration(info)) };
-  NAN_KEY_SET(duration, "h", Nan::New(times[0]));
-  NAN_KEY_SET(duration, "m", Nan::New(times[1]));
-  NAN_KEY_SET(duration, "s", Nan::New(times[2]));
-  NAN_KEY_SET(duration, "us", Nan::New(times[3]));
+  OBJECT_SET(duration, "h", Nan::New(times[0]));
+  OBJECT_SET(duration, "m", Nan::New(times[1]));
+  OBJECT_SET(duration, "s", Nan::New(times[2]));
+  OBJECT_SET(duration, "us", Nan::New(times[3]));
 
-  NAN_KEY_SET(output, "duration", duration);
-  NAN_KEY_SET(output, "seekable", Nan::New(!!gst_discoverer_info_get_seekable(info)));
-  NAN_KEY_SET(output, "live", Nan::New(!!gst_discoverer_info_get_live(info)));
-  NAN_KEY_SET(output, "topology", topology);
+  OBJECT_SET(output, "duration", duration);
+  OBJECT_SET(output, "seekable", Nan::New(!!gst_discoverer_info_get_seekable(info)));
+  OBJECT_SET(output, "live", Nan::New(!!gst_discoverer_info_get_live(info)));
+  OBJECT_SET(output, "topology", topology);
 
   addStreamInfo(sinfo, topology);
 }
