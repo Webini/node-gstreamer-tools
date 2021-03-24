@@ -10,10 +10,10 @@ void DiscoverInit(const Nan::FunctionCallbackInfo<v8::Value>& args) {
   }
 
   if (!args[1]->IsNumber()) {
-    Nan::ThrowTypeError("Wrong arguments");
+    Nan::ThrowTypeError("Timeout argument must be a number");
     return;
   }
-  
+
   Nan::Utf8String filepath(args[0]);
   double timeout = Nan::To<unsigned int>(args[1]).FromJust();
   Nan::Callback* callback = new Nan::Callback(Nan::To<v8::Function>(args[2]).ToLocalChecked());
